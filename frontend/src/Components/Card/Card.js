@@ -1,11 +1,12 @@
 import "./Card.scss";
-import Products from "./../../data/products";
+// import Products from "./../../data/products";
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
+import { Link } from "react-router-dom";
 
-const Card = () => {
-  const product = Products[0];
+const Card = (props) => {
+  const product = props.product;
 
-  return (
+  return product ? (
     <div className="card">
       <div className="card-img">
         <img
@@ -26,9 +27,12 @@ const Card = () => {
           <p>{product.numReviews} Reviews</p>
         </div>
         <h1>₹{product.price}</h1>
+        <Link className="btn" to={`/details/${product._id}`}>
+          Details
+        </Link>
       </div>
     </div>
-  );
+  ) : null;
 };
 
 export default Card;

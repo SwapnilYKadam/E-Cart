@@ -1,6 +1,8 @@
 import express from "express";
 import {
   addProductToWishlist,
+  addProductToCart,
+  removeProductFromCart,
   createUser,
   getAllUser,
   getUser,
@@ -12,10 +14,9 @@ const router = express.Router();
 router.route("/").get(getAllUser);
 router.route("/login").post(getUser);
 router.route("/signup").post(createUser);
-router.route("/addtowishlist").patch(addProductToWishlist);
+router.route("/addtowishlist").patch(protect, addProductToWishlist);
+router.route("/addproducttocart").patch(protect, addProductToCart);
+router.route("/removeproductfromcart").patch(protect, removeProductFromCart);
 
-router.use("/", (req, res) => {
-  res.send("This is user route");
-});
 
 export default router;

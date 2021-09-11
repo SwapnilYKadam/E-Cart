@@ -1,19 +1,27 @@
 import "./wishlist.scss";
-import cartItems from "../../data/cart";
 import Card from "../../Components/Card/Card";
+import { useSelector } from "react-redux";
+import Spinner from "./../../Components/spinner/spinner";
 
 const Wishlist = () => {
-  return (
-    <div className="wishlist">
-      <h1 className="wishlist_title">Wsihlist</h1>
-      <div className="wishlist_products">
-        {cartItems.map((product, i) => (
-          <Card key={i} product={product} />
-        ))}
-        <Card />
+  const authorizeUser = useSelector((state) => state.authorizeUser);
+  const { loading, user } = authorizeUser;
+  // const cartItems = [...user.wishList];
+  // console.log("wishlist:", cartItems);
+
+  return user ? loading ? (
+    <Spinner />
+  ) : (
+      <div className="wishlist">
+        <h1 className="wishlist_title">Wsihlist</h1>
+        <div className="wishlist_products">
+          {user.wishList.map((product, i) => (
+            <Card key={i} product={product} />
+          ))}
+          <Card />
+        </div>
       </div>
-    </div>
-  );
+    ) : <div className="noproduct"><p className="message">Login to add products in wishlist</p></div>
 };
 
 export default Wishlist;

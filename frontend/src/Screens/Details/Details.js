@@ -3,23 +3,61 @@ import { useLocation } from "react-router";
 import { Link } from "react-router-dom";
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
 import { useSelector, useDispatch } from "react-redux";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { getProduct } from "./../../actions/productAction";
 import Spinner from "../../Components/spinner/spinner";
+import { BsHeartFill } from "react-icons/bs";
+import { addProductToWishlist, addProductToCart } from "./../../actions/userAction";
 
 const Details = () => {
   const location = useLocation();
   const id = location.pathname.split("/")[2];
   const dispatch = useDispatch();
-
+  const [message, setMessage] = useState("");
   const productDetails = useSelector((state) => state.productDetails);
+  const { user } = useSelector((state) => state.authorizeUser);
+  const { error } = useSelector((state) => state.addProductToWishList);
+  const addItemToCart = useSelector((state) => state.addProductToCart);
+  const errorCart = addItemToCart ? addItemToCart.error : null;
   const { product, loading } = productDetails;
+
+  const addToWishlist = (e) => {
+    e.preventDefault();
+    if (!user) {
+      setMessage("Login to add product in wishlist.");
+      setTimeout(function () {
+        setMessage("");
+      }, 3000);
+      return;
+    }
+    setMessage("Product is added wishlist.");
+    dispatch(addProductToWishlist(user._id, id));
+    setTimeout(function () {
+      setMessage("");
+    }, 3000);
+  };
+
+  const addToCart = (e) => {
+    e.preventDefault();
+    if (!user) {
+      setMessage("Login to add product in cart.");
+      setTimeout(function () {
+        setMessage("");
+      }, 3000);
+      return;
+    }
+    setMessage("Product is added cart.");
+    console.log(user._id, id);
+
+    dispatch(addProductToCart(user._id, id));
+    setTimeout(function () {
+      setMessage("");
+    }, 3000);
+  };
 
   useEffect(() => {
     dispatch(getProduct(id));
   }, [dispatch, id]);
-
-  const added = false;
 
   if (!loading && product && Object.keys(product).length !== 0) {
     return product ? (
@@ -57,13 +95,28 @@ const Details = () => {
               <p className="details_content-info-description">
                 <b>Description:</b> {product.description}.
               </p>
-              {added ? (
+              <hr />
+              <button className="btn">
+                <BsHeartFill onClick={addToWishlist} />
+              </button>
+
+              {message ? (
                 <div className="details_content-info-added">
-                  Product is added to cart.
+                  {message}
                 </div>
               ) : (
-                ""
-              )}
+                  ""
+                )}
+              {error ? (
+                <div className="details_content-info-added">{error}</div>
+              ) : (
+                  ""
+                )}
+              {errorCart ? (
+                <div className="details_content-info-added">{errorCart}</div>
+              ) : (
+                  ""
+                )}
             </div>
             <div className="details_content-price">
               <div>
@@ -87,7 +140,7 @@ const Details = () => {
                 />
               </div>
               <div>
-                <button className="btn">Add to cart</button>
+                <button className="btn" onClick={addToCart}>Add to cart</button>
               </div>
             </div>
           </div>

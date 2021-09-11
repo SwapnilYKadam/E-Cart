@@ -36,7 +36,15 @@ export const createProduct = async (req, res) => {
 
 export const getAllProducts = async (req, res) => {
   try {
-    const products = await Product.find();
+    let products = await Product.find();
+    console.log(req.params.key);
+
+
+    if (req.params.key)
+      products = products.filter(p => p.name.toLowerCase().startsWith(req.params.key.toLowerCase()))
+
+    console.log();
+
 
     res.status(200).json({
       status: "success",
@@ -64,9 +72,9 @@ export const getProduct = async (req, res, next) => {
 
 export const getTopProduct = async (req, res) => {
   try {
-    let products = await Product.find();
+    let products = await Product.find({}).limit(3);
 
-    products = products.slice(0, 3);
+    // products = products.slice(0, 3);
 
     res.status(200).json({
       status: "success",

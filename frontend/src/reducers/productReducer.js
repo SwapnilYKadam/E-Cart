@@ -12,7 +12,7 @@ import {
 export const productListReducer = (state = { products: [] }, action) => {
   switch (action.type) {
     case PRODUCT_LIST_REQUEST:
-      return { products: [], loading: true };
+      return { loading: true };
     case PRODUCT_LIST_SUCCESS:
       return { products: action.payload, loading: false };
     case PRODUCT_LIST_FAILED:
@@ -28,7 +28,7 @@ export const productListTopThreeReducer = (
 ) => {
   switch (action.type) {
     case GET_TOPTHREE_REQUEST:
-      return { products: [], loading: true };
+      return { loading: true };
     case GET_TOPTHREE_SUCCESS:
       return { products: action.payload, loading: false };
     case GET_PRODUCT_FAILED:

@@ -69,6 +69,13 @@
 .checkout-btn {
   margin: 1rem;
 }
+
+.noproduct{
+  padding: 3rem 2rem;
+  background-color: #ddd;
+  min-height: 100vh;
+}
+
 @media only screen and (max-width: 880px) {
   .cart {
     flex-direction: column;

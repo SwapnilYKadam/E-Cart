@@ -27,6 +27,23 @@ export const listProducts = () => async (dispatch) => {
   }
 };
 
+export const searchProducts = (search) => async (dispatch) => {
+  try {
+    dispatch({ type: PRODUCT_LIST_REQUEST });
+    console.log(search);
+
+    const { data } = await axios.get(`/api/products/search/${search}`);
+    const { products } = data;
+
+    dispatch({ type: PRODUCT_LIST_SUCCESS, payload: products });
+  } catch (error) {
+    dispatch({
+      type: PRODUCT_LIST_FAILED,
+      payload: error.response && error.response.data.message,
+    });
+  }
+};
+
 export const listTopThree = () => async (dispatch) => {
   try {
     dispatch({ type: GET_TOPTHREE_REQUEST });

@@ -23,7 +23,12 @@ const userSchema = mongoose.Schema(
     wishList: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        required: true,
+        ref: "Product",
+      },
+    ],
+    cartItems: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
         ref: "Product",
       },
     ],

@@ -12,10 +12,7 @@ const router = express.Router();
 router.route("/").post(createProduct);
 router.route("/").get(getAllProducts);
 router.route("/topthree").get(getTopProduct);
-router.route("/:id").get(protect, getProduct);
-
-// router.use("/", (req, res) => {
-//   res.send("This is product route");
-// });
+router.route("/:id").get(getProduct);
+router.route("/search/:key").get(getAllProducts);
 
 export default router;

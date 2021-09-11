@@ -19,6 +19,14 @@
     letter-spacing: 3px;
   }
 
+  &_logoimg{
+    background-color: white;
+    clip-path: circle(40%);
+   img{
+     height: 3.5rem;
+   }
+  }
+
   &_search {
     height: 2rem;
     background-color: white;

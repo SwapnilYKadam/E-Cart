@@ -6,13 +6,23 @@ import {
   productListTopThreeReducer,
   productDetailsReducer,
 } from "./reducers/productReducer";
-import { authorizeUserReducer } from "./reducers/userReducer";
+import {
+  authorizeUserReducer,
+  signupUserReducer,
+  addProductToWishListReducer,
+  addProductToCartReducer,
+  removeProductToCartReducer
+} from "./reducers/userReducer";
 
 const reducers = combineReducers({
   productList: productListReducer,
   productListTopThree: productListTopThreeReducer,
   productDetails: productDetailsReducer,
   authorizeUser: authorizeUserReducer,
+  signupUser: signupUserReducer,
+  addProductToWishList: addProductToWishListReducer,
+  addProductToCart: addProductToCartReducer,
+  removeProductToCart: removeProductToCartReducer
 });
 
 const userInfoFromStorage = localStorage.getItem("userInfo")

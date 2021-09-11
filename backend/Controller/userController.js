@@ -23,7 +23,7 @@ export const createUser = async (req, res) => {
 
 export const getAllUser = async (req, res) => {
   try {
-    const users = await User.find();
+    const users = await User.find().populate("wishList");
 
     res.status(200).json({
       status: "success",
@@ -41,7 +41,7 @@ export const getUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const [user] = await User.find({ email }).populate("wishList");
+    const [user] = await User.find({ email }).populate("wishList").populate("cartItems");
 
     if (user) {
       const isValid = await bcrypt.compare(password, user.password);
@@ -51,6 +51,8 @@ export const getUser = async (req, res) => {
           name: user.name,
           email: user.email,
           address: user.address,
+          wishList: user.wishList,
+          cartItems: user.cartItems,
           token: getJsonWebToken(user._id),
         });
       } else {
@@ -58,6 +60,10 @@ export const getUser = async (req, res) => {
           message: "Email or password invalid",
         });
       }
+    } else {
+      res.status(401).json({
+        message: "User does not exist.",
+      });
     }
   } catch (err) {
     console.log(err);
@@ -66,18 +72,102 @@ export const getUser = async (req, res) => {
 
 export const addProductToWishlist = async (req, res) => {
   try {
-    const { id, productId } = req.body;
+    const { userId, productId } = req.body;
 
-    const user = await User.findById(id);
+    const user = await User.findById(userId);
+    const isProductExist = user.wishList.includes(productId);
+    if (user && !isProductExist) {
+      user.wishList.push(productId);
 
-    user.wishList.push(productId);
+      const updatedUser = await user.save().then((u) => u.populate("wishList")).then((u) => u.populate("cartItems"));
 
-    const updatedUser = await user.save();
-
-    res.status(200).json({
-      updatedUser,
-    });
+      res.status(200).json({
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        address: updatedUser.address,
+        wishList: updatedUser.wishList,
+        cartItems: updatedUser.cartItems,
+        token: getJsonWebToken(updatedUser._id),
+      });
+    } else
+      res
+        .status(401)
+        .json({ message: "Product already exisit in the wishlist" });
   } catch (err) {
     console.log(err);
   }
 };
+
+export const addProductToCart = async (req, res) => {
+  try {
+    const { userId, productId } = req.body;
+    console.log(req.body);
+
+    console.log(userId, productId);
+
+    const user = await User.findById(userId);
+    console.log(user);
+
+    if (user) {
+      user.cartItems.push(productId);
+      const updatedUser = await user.save().then((u) => u.populate("cartItems")).then((u) => u.populate("wishList"));
+      console.log(updatedUser);
+
+      res.status(200).json({
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        address: updatedUser.address,
+        wishList: updatedUser.wishList,
+        cartItems: updatedUser.cartItems,
+        token: getJsonWebToken(updatedUser._id),
+      })
+    } else {
+      res
+        .status(401)
+        .json({ message: "User is not logged in." });
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export const removeProductFromCart = async (req, res) => {
+  try {
+
+    const { userId, productId } = req.body;
+
+    const user = await User.findById(userId);
+
+    if (user) {
+      const index = user.cartItems.indexOf(productId);
+      if (index > -1) {
+        user.cartItems.splice(index, 1)
+        const updatedUser = await user.save().then((u) => u.populate("cartItems")).then((u) => u.populate("wishList"));
+
+        res.status(200).json({
+          _id: updatedUser._id,
+          name: updatedUser.name,
+          email: updatedUser.email,
+          address: updatedUser.address,
+          wishList: updatedUser.wishList,
+          cartItems: updatedUser.cartItems,
+          token: getJsonWebToken(updatedUser._id),
+        })
+      } else {
+        res
+          .status(401)
+          .json({ message: "Product is not in cart" });
+      }
+    } else {
+      res
+        .status(401)
+        .json({ message: "User is not logged in." });
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+}

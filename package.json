@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@stripe/stripe-js": "^1.17.1",
     "axios": "^0.21.2",
     "bcrypt": "^5.0.1",
     "bcryptjs": "^2.4.3",
@@ -25,6 +26,7 @@
     "redux": "^4.1.1",
     "redux-devtools-extension": "^2.13.9",
     "redux-thunk": "^2.3.0",
+    "stripe": "^8.174.0",
     "thunk": "0.0.1"
   }
 }

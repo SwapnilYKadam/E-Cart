@@ -47,7 +47,6 @@ const Details = () => {
       return;
     }
     setMessage("Product is added cart.");
-    console.log(user._id, id);
 
     dispatch(addProductToCart(user._id, id));
     setTimeout(function () {

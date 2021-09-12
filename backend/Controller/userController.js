@@ -14,10 +14,24 @@ export const createUser = async (req, res) => {
     });
 
     res.status(200).json({
-      data,
+      _id: data._id,
+      name: data.name,
+      email: data.email,
+      address: data.address,
+      wishList: data.wishList,
+      cartItems: data.cartItems,
+      token: getJsonWebToken(data._id),
     });
   } catch (err) {
-    console.log(err);
+    if (err.code === 11000) {
+      res.json({
+        message: "Email already registered",
+      });
+    } else {
+      res.json({
+        message: "Something went wrong.",
+      });
+    }
   }
 };
 
@@ -41,7 +55,9 @@ export const getUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const [user] = await User.find({ email }).populate("wishList").populate("cartItems");
+    const [user] = await User.find({ email })
+      .populate("wishList")
+      .populate("cartItems");
 
     if (user) {
       const isValid = await bcrypt.compare(password, user.password);
@@ -79,7 +95,10 @@ export const addProductToWishlist = async (req, res) => {
     if (user && !isProductExist) {
       user.wishList.push(productId);
 
-      const updatedUser = await user.save().then((u) => u.populate("wishList")).then((u) => u.populate("cartItems"));
+      const updatedUser = await user
+        .save()
+        .then((u) => u.populate("wishList"))
+        .then((u) => u.populate("cartItems"));
 
       res.status(200).json({
         _id: updatedUser._id,
@@ -102,17 +121,15 @@ export const addProductToWishlist = async (req, res) => {
 export const addProductToCart = async (req, res) => {
   try {
     const { userId, productId } = req.body;
-    console.log(req.body);
-
-    console.log(userId, productId);
 
     const user = await User.findById(userId);
-    console.log(user);
 
     if (user) {
       user.cartItems.push(productId);
-      const updatedUser = await user.save().then((u) => u.populate("cartItems")).then((u) => u.populate("wishList"));
-      console.log(updatedUser);
+      const updatedUser = await user
+        .save()
+        .then((u) => u.populate("cartItems"))
+        .then((u) => u.populate("wishList"));
 
       res.status(200).json({
         _id: updatedUser._id,
@@ -122,21 +139,17 @@ export const addProductToCart = async (req, res) => {
         wishList: updatedUser.wishList,
         cartItems: updatedUser.cartItems,
         token: getJsonWebToken(updatedUser._id),
-      })
+      });
     } else {
-      res
-        .status(401)
-        .json({ message: "User is not logged in." });
+      res.status(401).json({ message: "User is not logged in." });
     }
-
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 export const removeProductFromCart = async (req, res) => {
   try {
-
     const { userId, productId } = req.body;
 
     const user = await User.findById(userId);
@@ -144,8 +157,11 @@ export const removeProductFromCart = async (req, res) => {
     if (user) {
       const index = user.cartItems.indexOf(productId);
       if (index > -1) {
-        user.cartItems.splice(index, 1)
-        const updatedUser = await user.save().then((u) => u.populate("cartItems")).then((u) => u.populate("wishList"));
+        user.cartItems.splice(index, 1);
+        const updatedUser = await user
+          .save()
+          .then((u) => u.populate("cartItems"))
+          .then((u) => u.populate("wishList"));
 
         res.status(200).json({
           _id: updatedUser._id,
@@ -155,19 +171,14 @@ export const removeProductFromCart = async (req, res) => {
           wishList: updatedUser.wishList,
           cartItems: updatedUser.cartItems,
           token: getJsonWebToken(updatedUser._id),
-        })
+        });
       } else {
-        res
-          .status(401)
-          .json({ message: "Product is not in cart" });
+        res.status(401).json({ message: "Product is not in cart" });
       }
     } else {
-      res
-        .status(401)
-        .json({ message: "User is not logged in." });
+      res.status(401).json({ message: "User is not logged in." });
     }
-
   } catch (error) {
     console.log(error);
   }
-}
+};

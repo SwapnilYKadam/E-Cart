@@ -24,7 +24,6 @@ export const getUserInfo = (email, password) => async (dispatch) => {
 
     const { data } = await axios.post("/api/users/login", { email, password });
     dispatch({ type: GET_USER_SUCCESS, payload: data });
-
     localStorage.setItem("userInfo", JSON.stringify(data));
   } catch (error) {
     dispatch({
@@ -53,13 +52,11 @@ export const signupUser =
         password,
         address,
       });
-      const user = data.data;
+      localStorage.setItem("userInfo", JSON.stringify(data));
 
-      localStorage.setItem("userInfo", JSON.stringify(user));
-      dispatch({ type: GET_USER_SUCCESS, payload: user });
-      dispatch({ type: CREATE_USER_SUCCESS, payload: user });
+      dispatch({ type: CREATE_USER_SUCCESS, payload: data });
+      dispatch({ type: GET_USER_SUCCESS, payload: data });
     } catch (error) {
-      console.log(error);
       dispatch({
         type: CREATE_USER_FAILED,
         payload: error.response && error.response.data.message,
@@ -67,96 +64,106 @@ export const signupUser =
     }
   };
 
-export const addProductToWishlist = (userId, productId) => async (dispatch, getState) => {
-  try {
-    dispatch({ type: ADD_PRODUCT_TO_WISHLIST_REQUEST });
+export const addProductToWishlist =
+  (userId, productId) => async (dispatch, getState) => {
+    try {
+      dispatch({ type: ADD_PRODUCT_TO_WISHLIST_REQUEST });
 
-    const { authorizeUser } = getState();
-    const { user } = authorizeUser;
-    console.log(user.token);
+      const { authorizeUser } = getState();
+      const { user } = authorizeUser;
 
-    const config = {
-      headers: {
-        Authorization: `Bearer ${user.token}`
-      }
+      const config = {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+
+      const { data } = await axios.patch(
+        "/api/users/addtowishlist",
+        {
+          userId,
+          productId,
+        },
+        config
+      );
+
+      localStorage.setItem("userInfo", JSON.stringify(data));
+      dispatch({ type: GET_USER_SUCCESS, payload: data });
+      dispatch({ type: ADD_PRODUCT_TO_WISHLIST_SUCCESS, payload: data });
+    } catch (error) {
+      dispatch({
+        type: ADD_PRODUCT_TO_WISHLIST_FAILED,
+        payload: error.response && error.response.data.message,
+      });
     }
+  };
 
-    const { data } = await axios.patch("/api/users/addtowishlist", {
-      userId,
-      productId,
-    }, config);
+export const addProductToCart =
+  (userId, productId) => async (dispatch, getState) => {
+    try {
+      dispatch({ type: ADD_PRODUCT_TO_CART_REQUEST });
 
-    localStorage.setItem("userInfo", JSON.stringify(data));
-    dispatch({ type: GET_USER_SUCCESS, payload: data });
-    dispatch({ type: ADD_PRODUCT_TO_WISHLIST_SUCCESS, payload: data });
-  } catch (error) {
-    console.log(error);
-    dispatch({
-      type: ADD_PRODUCT_TO_WISHLIST_FAILED,
-      payload: error.response && error.response.data.message,
-    });
-  }
-};
+      const { authorizeUser } = getState();
+      const { user } = authorizeUser;
 
-export const addProductToCart = (userId, productId) => async (dispatch, getState) => {
-  try {
-    dispatch({ type: ADD_PRODUCT_TO_CART_REQUEST })
+      const config = {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
 
-    const { authorizeUser } = getState();
-    const { user } = authorizeUser;
-    console.log(user.token);
-
-    const config = {
-      headers: {
-        Authorization: `Bearer ${user.token}`
-      }
+      const { data } = await axios.patch(
+        "/api/users/addproducttocart",
+        {
+          userId,
+          productId,
+        },
+        config
+      );
+      localStorage.setItem("userInfo", JSON.stringify(data));
+      dispatch({ type: GET_USER_SUCCESS, payload: data });
+      dispatch({ type: ADD_PRODUCT_TO_CART_SUCCESS, payload: data });
+    } catch (error) {
+      dispatch({
+        type: ADD_PRODUCT_TO_CART_FAILED,
+        payload: error.response && error.response.data.message,
+      });
     }
+  };
 
+export const removeProduct =
+  (userId, productId) => async (dispatch, getState) => {
+    try {
+      dispatch({ type: REMOVE_PRODUCT_FROM_CART_REQUEST });
 
-    const { data } = await axios.patch('/api/users/addproducttocart', {
-      userId, productId
-    }, config);
-    localStorage.setItem("userInfo", JSON.stringify(data));
-    dispatch({ type: GET_USER_SUCCESS, payload: data });
-    dispatch({ type: ADD_PRODUCT_TO_CART_SUCCESS, payload: data });
-  } catch (error) {
-    dispatch({
-      type: ADD_PRODUCT_TO_CART_FAILED, payload: error.response && error.response.data.message,
-    })
-  }
-}
+      const { authorizeUser } = getState();
+      const { user } = authorizeUser;
 
+      const updatedUser = user.cartItems.filter((p) => p._id !== productId);
+      localStorage.setItem("userInfo", JSON.stringify(updatedUser));
 
-export const removeProduct = (userId, productId) => async (dispatch, getState) => {
-  try {
-    dispatch({ type: REMOVE_PRODUCT_FROM_CART_REQUEST })
+      const config = {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
 
-    const { authorizeUser } = getState();
-    const { user } = authorizeUser;
-    console.log(user.token);
+      const { data } = await axios.patch(
+        "/api/users/removeproductfromcart",
+        {
+          userId,
+          productId,
+        },
+        config
+      );
 
-    const updatedUser = user.cartItems.filter(p => p._id !== productId)
-    localStorage.setItem("userInfo", JSON.stringify(user));
-
-    const config = {
-      headers: {
-        Authorization: `Bearer ${user.token}`
-      }
+      localStorage.setItem("userInfo", JSON.stringify(data));
+      dispatch({ type: GET_USER_SUCCESS, payload: data });
+      dispatch({ type: REMOVE_PRODUCT_FROM_CART_SUCCESS, payload: data });
+    } catch (error) {
+      dispatch({
+        type: REMOVE_PRODUCT_FROM_CART_FAILED,
+        payload: error.response && error.response.data.message,
+      });
     }
-
-    const { data } = await axios.patch('/api/users/removeproductfromcart', {
-      userId, productId
-    }, config);
-
-    console.log(data);
-
-
-    // localStorage.setItem("userInfo", JSON.stringify(data));
-    dispatch({ type: GET_USER_SUCCESS, payload: data });
-    dispatch({ type: REMOVE_PRODUCT_FROM_CART_SUCCESS, payload: data });
-  } catch (error) {
-    dispatch({
-      type: REMOVE_PRODUCT_FROM_CART_FAILED, payload: error.response && error.response.data.message,
-    })
-  }
-} 
+  };

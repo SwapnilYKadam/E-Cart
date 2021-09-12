@@ -30,7 +30,6 @@ export const listProducts = () => async (dispatch) => {
 export const searchProducts = (search) => async (dispatch) => {
   try {
     dispatch({ type: PRODUCT_LIST_REQUEST });
-    console.log(search);
 
     const { data } = await axios.get(`/api/products/search/${search}`);
     const { products } = data;

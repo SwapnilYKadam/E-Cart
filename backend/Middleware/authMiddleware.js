@@ -3,7 +3,6 @@ import User from "../Model/userModel.js";
 
 export const protect = async (req, res, next) => {
   let token;
-  console.log(req.headers.authorization);
 
   if (
     req.headers.authorization &&

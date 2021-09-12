@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useHistory } from "react-router";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { signupUser } from "../../actions/userAction.js";
 import "./Register.scss";
 
@@ -13,16 +13,17 @@ const Register = () => {
   const [message, setMessage] = useState();
   const history = useHistory();
   const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.signupUser);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(password, confirmPassword);
     if (password !== confirmPassword) {
-      setMessage("Passwords dont match");
+      setMessage("Passwords don't match");
       return;
     }
 
     dispatch(signupUser(name, email, password, address));
+
     history.push("/");
   };
 
@@ -30,8 +31,11 @@ const Register = () => {
     <div className="register">
       <form className="register_box">
         <div className="register_box-title">Create your account</div>
+        {user && user.message ? (
+          <p className="message">{user.message}</p>
+        ) : null}
+        {message ? <p className="message">Passwords don't match.</p> : null}
         <div className="register_box-input">
-          {message ? <p className="message">Passwords don't match.</p> : null}
           <label htmlFor="name">Name</label>
           <input
             type="text"

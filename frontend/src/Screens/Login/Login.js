@@ -15,7 +15,6 @@ const Login = () => {
   const { loading, user, error } = authorizeUser;
 
   useEffect(() => {
-    console.log(authorizeUser);
     if (user) {
       history.push("/");
     }

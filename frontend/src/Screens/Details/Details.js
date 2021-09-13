@@ -7,7 +7,10 @@ import { useEffect, useState } from "react";
 import { getProduct } from "./../../actions/productAction";
 import Spinner from "../../Components/spinner/spinner";
 import { BsHeartFill } from "react-icons/bs";
-import { addProductToWishlist, addProductToCart } from "./../../actions/userAction";
+import {
+  addProductToWishlist,
+  addProductToCart,
+} from "./../../actions/userAction";
 
 const Details = () => {
   const location = useLocation();
@@ -30,11 +33,13 @@ const Details = () => {
       }, 3000);
       return;
     }
-    setMessage("Product is added wishlist.");
     dispatch(addProductToWishlist(user._id, id));
-    setTimeout(function () {
-      setMessage("");
-    }, 3000);
+    if (!error) {
+      setMessage("Product is added wishlist.");
+      setTimeout(function () {
+        setMessage("");
+      }, 3000);
+    }
   };
 
   const addToCart = (e) => {
@@ -95,27 +100,27 @@ const Details = () => {
                 <b>Description:</b> {product.description}.
               </p>
               <hr />
-              <button className="btn">
-                <BsHeartFill onClick={addToWishlist} />
+              <button className="btn" onClick={addToWishlist}>
+                <BsHeartFill />
               </button>
 
-              {message ? (
-                <div className="details_content-info-added">
-                  {message}
-                </div>
-              ) : (
-                  ""
-                )}
               {error ? (
                 <div className="details_content-info-added">{error}</div>
+              ) : message ? (
+                <div className="details_content-info-added">{message}</div>
               ) : (
-                  ""
-                )}
+                ""
+              )}
+              {/* {message && !error ? (
+                <div className="details_content-info-added">{message}</div>
+              ) : (
+                ""
+              )} */}
               {errorCart ? (
                 <div className="details_content-info-added">{errorCart}</div>
               ) : (
-                  ""
-                )}
+                ""
+              )}
             </div>
             <div className="details_content-price">
               <div>
@@ -139,7 +144,9 @@ const Details = () => {
                 />
               </div>
               <div>
-                <button className="btn" onClick={addToCart}>Add to cart</button>
+                <button className="btn" onClick={addToCart}>
+                  Add to cart
+                </button>
               </div>
             </div>
           </div>
